@@ -1,28 +1,45 @@
 /**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
+ * WhatsApp-like Notification App
+ * React Native app with Firebase Cloud Messaging
+ * 
  * @format
  */
 
-import { NewAppScreen } from '@react-native/new-app-screen';
-import { StatusBar, StyleSheet, useColorScheme, View } from 'react-native';
+import React, { useEffect } from 'react';
+import { StatusBar, Alert } from 'react-native';
+import AppNavigator from './src/navigation/AppNavigator';
+import NotificationService from './src/services/NotificationService';
 
 function App() {
-  const isDarkMode = useColorScheme() === 'dark';
+  useEffect(() => {
+    initializeApp();
+    
+    return () => {
+      NotificationService.destroy();
+    };
+  }, []);
+
+  const initializeApp = async () => {
+    try {
+      console.log('Initializing WhatsApp Notification App...');
+      await NotificationService.initialize();
+      console.log('App initialized successfully');
+    } catch (error) {
+      console.error('Error initializing app:', error);
+      Alert.alert(
+        'Initialization Error',
+        'Failed to initialize notifications. Some features may not work properly.',
+        [{ text: 'OK' }]
+      );
+    }
+  };
 
   return (
-    <View style={styles.container}>
-      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-      <NewAppScreen templateFileName="App.tsx" />
-    </View>
+    <>
+      <StatusBar backgroundColor="#128C7E" barStyle="light-content" />
+      <AppNavigator />
+    </>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-});
 
 export default App;

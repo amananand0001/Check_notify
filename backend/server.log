@@ -1,0 +1,8 @@
+
+> whatsapp-notification-backend@1.0.0 start
+> node server.js
+
+🚀 WhatsApp Notification Backend Server running on port 3000
+📱 Server URL: http://localhost:3000
+🔗 API Documentation: http://localhost:3000/
+💚 Health Check: http://localhost:3000/health

@@ -1,97 +1,309 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# WhatsApp-like Notification App
 
-# Getting Started
+A React Native application that demonstrates real-time push notifications similar to WhatsApp, with support for Android 15, deep linking, badge counts, and local notification storage.
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+## Features
 
-## Step 1: Start Metro
+✅ **Real-time Push Notifications** - Firebase Cloud Messaging integration  
+✅ **Background/Foreground Handling** - Notifications work when app is closed or in background  
+✅ **Native Android Module** - Custom Java/Kotlin module for advanced notification handling  
+✅ **Deep Linking** - Click notifications to open specific screens  
+✅ **Badge Counts** - WhatsApp-like unread message indicators  
+✅ **Local Storage** - Persistent notification history  
+✅ **Backend Simulation** - Test server for triggering notifications  
+✅ **Android 15 Support** - Compatible with latest Android version  
+✅ **WhatsApp-like UI** - Familiar chat interface  
 
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
+## Architecture
 
-To start the Metro dev server, run the following command from the root of your React Native project:
+```
+├── React Native App (Frontend)
+│   ├── Firebase Cloud Messaging
+│   ├── Navigation (React Navigation)
+│   ├── Local Storage (AsyncStorage)
+│   └── Custom Native Module
+├── Native Android Module (Java/Kotlin)
+│   ├── NotificationService (FCM Handler)
+│   ├── NotificationModule (RN Bridge)
+│   └── Deep Link Handler
+└── Backend Server (Node.js)
+    ├── Express API
+    ├── Notification Endpoints
+    └── Device Management
+```
 
-```sh
-# Using npm
+## Prerequisites
+
+- Node.js 16+
+- React Native CLI
+- Android Studio
+- Java 17+
+- Android SDK (API 33+)
+
+## Installation
+
+### 1. Clone and Setup
+
+```bash
+git clone <repository>
+cd WhatsAppNotificationApp
+npm install
+```
+
+### 2. Android Setup
+
+```bash
+# Install Android dependencies
+cd android
+./gradlew clean
+cd ..
+```
+
+### 3. Backend Setup
+
+```bash
+cd backend
+npm install
 npm start
-
-# OR using Yarn
-yarn start
 ```
 
-## Step 2: Build and run your app
+The backend server will run on `http://localhost:3000`
 
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
+## Running the App
 
-### Android
+### Development Mode
 
-```sh
-# Using npm
-npm run android
+```bash
+# Start Metro bundler
+npx react-native start
 
-# OR using Yarn
-yarn android
+# Run on Android (in another terminal)
+npx react-native run-android
 ```
 
-### iOS
+### Production Build
 
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
-
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
-
-```sh
-bundle install
+```bash
+cd android
+./gradlew assembleRelease
 ```
 
-Then, and every time you update your native dependencies, run:
+## Project Structure
 
-```sh
-bundle exec pod install
+```
+WhatsAppNotificationApp/
+├── src/
+│   ├── components/          # Reusable UI components
+│   ├── screens/            # App screens
+│   │   ├── HomeScreen.js   # Main notification list
+│   │   ├── ChatScreen.js   # Chat interface
+│   │   └── TestNotificationsScreen.js
+│   ├── services/           # Business logic
+│   │   └── NotificationService.js
+│   └── navigation/         # Navigation setup
+├── android/
+│   └── app/src/main/java/com/whatsappnotificationapp/
+│       ├── NotificationService.kt    # FCM message handler
+│       ├── NotificationModule.kt     # React Native bridge
+│       └── NotificationPackage.kt    # Module registration
+├── backend/                # Test server
+│   ├── server.js          # Express server
+│   └── package.json
+└── firebase.json          # Firebase configuration
 ```
 
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
+## Key Components
 
-```sh
-# Using npm
-npm run ios
+### 1. NotificationService.kt (Native Android)
 
-# OR using Yarn
-yarn ios
+Handles Firebase Cloud Messaging events:
+- Receives push notifications
+- Shows system notifications
+- Manages deep linking
+- Updates badge counts
+- Stores notifications locally
+
+### 2. NotificationModule.kt (React Native Bridge)
+
+Provides JavaScript interface for:
+- Getting FCM tokens
+- Managing badge counts
+- Subscribing to topics
+- Handling deep links
+- Clearing notifications
+
+### 3. NotificationService.js (React Native)
+
+JavaScript service that:
+- Initializes FCM
+- Handles foreground/background messages
+- Manages local storage
+- Provides event emitters
+- Coordinates with native module
+
+### 4. Backend Server (Node.js)
+
+Test server providing:
+- Send notifications to devices
+- Topic-based notifications
+- Call simulation
+- Device registration
+- Notification history
+
+## Usage
+
+### 1. Basic Setup
+
+1. Start the backend server
+2. Launch the React Native app
+3. Copy the FCM token from the home screen
+4. Use the test screen to send notifications
+
+### 2. Testing Notifications
+
+**From the App:**
+- Go to "Test Notifications" screen
+- Configure notification content
+- Send test notifications
+- Test deep linking
+
+**From Backend API:**
+```bash
+curl -X POST http://localhost:3000/send-notification \
+  -H "Content-Type: application/json" \
+  -d '{
+    "token": "your_fcm_token",
+    "title": "New Message",
+    "body": "Hello from backend!",
+    "data": {
+      "chatId": "chat123",
+      "sender": "John Doe"
+    }
+  }'
 ```
 
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
+### 3. Deep Linking
 
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
+Notifications can include deep link data:
+```json
+{
+  "data": {
+    "chatId": "chat123",
+    "sender": "John Doe",
+    "messageId": "msg456"
+  }
+}
+```
 
-## Step 3: Modify your app
+Clicking the notification will open the chat screen with the specified data.
 
-Now that you have successfully run the app, let's make changes!
+### 4. Badge Management
 
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
+```javascript
+// Get current badge count
+const count = await NotificationService.getBadgeCount();
 
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
+// Update badge count
+await NotificationService.updateBadgeCount(5);
 
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
+// Clear badge
+await NotificationService.clearBadgeCount();
+```
 
-## Congratulations! :tada:
+## API Endpoints
 
-You've successfully run and modified your React Native App. :partying_face:
+### Backend Server Endpoints
 
-### Now what?
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/` | API documentation |
+| POST | `/send-notification` | Send notification to device |
+| POST | `/send-topic-notification` | Send to topic subscribers |
+| POST | `/simulate-call` | Simulate call notification |
+| POST | `/register-device` | Register device token |
+| GET | `/devices` | List registered devices |
+| GET | `/notifications` | Notification history |
+| GET | `/health` | Health check |
 
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
+## Firebase Configuration
 
-# Troubleshooting
+The app includes a mock Firebase configuration. For production:
 
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
+1. Create a Firebase project
+2. Add Android app to project
+3. Download `google-services.json`
+4. Replace the mock file in `android/app/`
+5. Update Firebase configuration
 
-# Learn More
+## Android Permissions
 
-To learn more about React Native, take a look at the following resources:
+Required permissions (automatically added):
+- `POST_NOTIFICATIONS` (Android 13+)
+- `INTERNET`
+- `WAKE_LOCK`
+- `VIBRATE`
+- `RECEIVE_BOOT_COMPLETED`
 
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+## Troubleshooting
+
+### Common Issues
+
+1. **Notifications not received:**
+   - Check FCM token is valid
+   - Verify Firebase configuration
+   - Ensure app has notification permissions
+
+2. **Deep linking not working:**
+   - Check intent filters in AndroidManifest.xml
+   - Verify notification data format
+   - Test with `adb shell am start` command
+
+3. **Badge count not updating:**
+   - Check if launcher supports badges
+   - Verify native module is properly linked
+   - Test on different devices/launchers
+
+### Debug Commands
+
+```bash
+# Check if app is receiving notifications
+adb logcat | grep NotificationService
+
+# Test deep linking manually
+adb shell am start \
+  -W -a android.intent.action.VIEW \
+  -d "whatsappnotification://chat?chatId=test123" \
+  com.whatsappnotificationapp
+
+# Check notification permissions
+adb shell dumpsys notification
+```
+
+## Production Considerations
+
+1. **Security:**
+   - Implement proper authentication
+   - Validate notification data
+   - Use HTTPS for backend
+
+2. **Performance:**
+   - Optimize notification handling
+   - Implement proper error handling
+   - Add retry mechanisms
+
+3. **Scalability:**
+   - Use proper database for storage
+   - Implement rate limiting
+   - Add monitoring and logging
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Submit a pull request
+
+## License
+
+This project is for educational purposes and demonstrates React Native push notification implementation.
